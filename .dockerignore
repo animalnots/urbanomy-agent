@@ -3,7 +3,6 @@
 .env
 outputs
 examples
-data
 *.egg-info
 tests
 **/__pycache__

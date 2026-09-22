@@ -9,6 +9,7 @@ COPY urbanomy ./urbanomy
 COPY urbanomy_agent ./urbanomy_agent
 COPY urbanomy_mcp ./urbanomy_mcp
 RUN pip install --no-cache-dir .
+COPY data ./data
 RUN useradd --create-home --uid 10001 urbanomy && mkdir -p /app/outputs \
     && chown -R urbanomy:urbanomy /app/outputs
 USER urbanomy
