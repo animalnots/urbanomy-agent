@@ -15,6 +15,13 @@ def init_llm(model: str | None = None, temperature: float = 0.5):
         raise ValueError("LLM_NOT_CONFIGURED: set OPENAI_API_KEY or API_KEY, or use_llm=false.")
     if not name:
         raise ValueError("LLM_NOT_CONFIGURED: set URBANOMY_LLM_MODEL.")
+    effort = os.getenv("URBANOMY_REASONING_EFFORT")
+    extra: dict = {}
+    if effort:
+        # extra_body sends reasoning.effort as a request field; the reasoning= kwarg would
+        # switch langchain to the Responses API. Reasoning-mandatory models (glm-5.3-flash)
+        # otherwise think unbudgeted and one scorer call can outlast the A2A read timeout.
+        extra["extra_body"] = {"reasoning": {"effort": effort}}
     return ChatOpenAI(
         model=name,
         api_key=key,
@@ -23,4 +30,5 @@ def init_llm(model: str | None = None, temperature: float = 0.5):
         temperature=temperature,
         timeout=60,
         max_retries=1,
+        **extra,
     )

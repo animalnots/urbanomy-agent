@@ -134,11 +134,13 @@ class StrategicAlignmentScorer:
         )
 
     def _parse_response(self, raw_response: Any) -> float:
-        if isinstance(raw_response, BaseModel):
+        if isinstance(raw_response, BaseModel) and not hasattr(raw_response, "content"):
             payload = raw_response.model_dump()
         elif isinstance(raw_response, Mapping):
             payload = dict(raw_response)
         else:
+            # A LangChain chat message is also a BaseModel, but its score sits in .content
+            # as JSON text, not in fields to dump; route it through text parsing.
             payload = json.loads(_message_to_text(raw_response))
         return float(Evaluation.model_validate(payload).score)
 
